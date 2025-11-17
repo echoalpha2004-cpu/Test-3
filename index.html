@@ -1,282 +1,75 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>AR Clothing Prototype — Demo</title>
-
-  <style>
-    :root{--bg:#0b0b0b;--panel:#111;--accent:#ffd166}
-    html,body{height:100%;margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:#000;color:#eee;}
-
-    /* --- FULLSCREEN SCREENS --- */
-    .screen{
-      position:fixed;
-      inset:0;
-      background:#000;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-      z-index:9999;
-      transition:opacity .4s ease;
-    }
-    .screen.hidden{
-      opacity:0;
-      pointer-events:none;
-    }
-
-    /* Title screen */
-    #titleScreen img{
-      width:240px;
-      max-width:70%;
-      margin-bottom:20px;
-    }
-    #titleScreen .tap{
-      font-size:18px;
-      opacity:0.7;
-    }
-
-    /* PIN screen */
-    #pinScreen{
-      padding:20px;
-      text-align:center;
-      background:#000;
-    }
-    #pinDisplay{
-      font-size:32px;
-      letter-spacing:14px;
-      margin-bottom:24px;
-    }
-    .keypad{
-      display:grid;
-      grid-template-columns:repeat(3,70px);
-      gap:12px;
-      justify-content:center;
-    }
-    .keypad button{
-      background:#222;
-      border:1px solid #444;
-      color:#fff;
-      font-size:22px;
-      padding:16px;
-      border-radius:8px;
-    }
-    .keypad button:active{
-      background:#333;
-    }
-
-    /* --- ORIGINAL APP STYLE BELOW UNCHANGED --- */
-    .app{height:100%;display:none;flex-direction:column;background:var(--bg);}
-    #view{position:relative;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
-    video#camera{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
-    canvas#videoCanvas{position:absolute;top:0;left:0;width:100%;height:100%;}
-    img#overlay{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);max-width:70%;opacity:0.95;pointer-events:none}
-
-    .topbar{display:flex;gap:8px;padding:8px;background:linear-gradient(180deg,rgba(0,0,0,0.4),transparent);position:absolute;top:0;left:0;right:0;z-index:20}
-    button{background:#222;border:1px solid #333;color:#fff;padding:8px 10px;border-radius:6px}
-    .infoPanel{position:absolute;right:8px;bottom:8px;background:var(--panel);padding:12px;border-radius:10px;max-width:46%;z-index:20}
-    .hint{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,0.45);padding:8px;border-radius:8px;font-size:12px}
-    .modeBadge{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:#111;padding:6px 12px;border-radius:999px;border:1px solid #222;z-index:20}
-    .portraitInfo{display:none;padding:12px}
-
-    @media (orientation: portrait){
-      .portraitInfo{display:block;background:var(--panel);height:100%;overflow:auto}
-      #view{display:none}
-    }
-
-    footer{padding:8px;text-align:center;font-size:12px;background:linear-gradient(0deg,rgba(0,0,0,0.5),transparent)}
-    .metaLabel{color:#ccc;font-size:13px}
-  </style>
-</head>
-<body>
-
-<!-- --------------------- TITLE SCREEN --------------------- -->
-<div id="titleScreen" class="screen">
-  <img src="logo.png" alt="Logo">
-  <div class="tap">Tap to Continue</div>
-</div>
-
-<!-- --------------------- PIN SCREEN ----------------------- -->
-<div id="pinScreen" class="screen hidden">
-  <h2>Enter PIN</h2>
-  <div id="pinDisplay">____</div>
-
-  <div class="keypad">
-    <button data-n="1">1</button>
-    <button data-n="2">2</button>
-    <button data-n="3">3</button>
-    <button data-n="4">4</button>
-    <button data-n="5">5</button>
-    <button data-n="6">6</button>
-    <button data-n="7">7</button>
-    <button data-n="8">8</button>
-    <button data-n="9">9</button>
-    <button id="pinClear">C</button>
-    <button data-n="0">0</button>
-    <button id="pinDelete">⌫</button>
-  </div>
-</div>
-
-<!-- ------------------ ORIGINAL APP INTERFACE ---------------- -->
-<div class="app" id="app">
-  <div id="view">
-    <video id="camera" autoplay playsinline></video>
-    <canvas id="videoCanvas"></canvas>
-    <img id="overlay" src="" style="display:none">
-
-    <div class="topbar">
-      <button id="scanBtn">Scan QR</button>
-      <button id="toggleMirror">Toggle Mirror</button>
-      <div style="flex:1"></div>
-      <div id="status">No item scanned</div>
-    </div>
-
-    <div class="modeBadge" id="modeBadge">Mode: <span id="modeText">AR try-on</span></div>
-
-    <div class="infoPanel" id="infoPanel" style="display:none">
-      <div><strong id="itemTitle"></strong></div>
-      <div class="metaLabel" id="itemMeta"></div>
-      <div style="margin-top:8px;">Recommendations:</div>
-      <div id="recs"></div>
-    </div>
-
-    <div class="hint">Tip: Hold horizontally for try-on, vertically for item info</div>
-  </div>
-
-  <div class="portraitInfo" id="portraitInfo">
-    <h2 id="pTitle">No item scanned</h2>
-    <p id="pMeta"></p>
-    <div id="pRecs"></div>
-  </div>
-
-  <footer>Prototype — student build. Serve via HTTPS for camera access.</footer>
-</div>
-
-<!-- jsQR -->
-<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.min.js"></script>
-
 <script>
-/* ---------------------- TITLE → PIN LOGIC ----------------------- */
-const titleScreen = document.getElementById("titleScreen");
-const pinScreen   = document.getElementById("pinScreen");
-const app         = document.getElementById("app");
-
-const CORRECT_PIN = "1234";   // *** CHANGE THIS TO YOUR PIN ***
-let enteredPIN = "";
-
-// Title screen → go to PIN screen
-titleScreen.addEventListener("click", () => {
-  titleScreen.classList.add("hidden");
-  setTimeout(() => pinScreen.classList.remove("hidden"), 400);
-});
-
-// PIN buttons
-document.querySelectorAll("#pinScreen button[data-n]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    if (enteredPIN.length < 4) {
-      enteredPIN += btn.dataset.n;
-      updatePinDisplay();
-      if (enteredPIN.length === 4) checkPIN();
-    }
-  });
-});
-
-document.getElementById("pinClear").onclick = () => {
-  enteredPIN = "";
-  updatePinDisplay();
-};
-
-document.getElementById("pinDelete").onclick = () => {
-  enteredPIN = enteredPIN.slice(0,-1);
-  updatePinDisplay();
-};
-
-function updatePinDisplay(){
-  document.getElementById("pinDisplay").textContent =
-    enteredPIN.padEnd(4,"_");
-}
-
-function checkPIN(){
-  if(enteredPIN === CORRECT_PIN){
-    pinScreen.classList.add("hidden");
-    setTimeout(()=> {
-      app.style.display = "flex";
-      startCamera();
-      updateMode();
-    },400);
-  } else {
-    alert("Incorrect PIN");
-    enteredPIN="";
-    updatePinDisplay();
-  }
-}
-
-/* ---------------------- ORIGINAL QR + AR LOGIC ----------------------- */
-
+/* ---------------------- ITEM DATABASE (3D ready) ----------------------- */
 const ITEM_DB = {
-  "item:shirt:001":{
-    title:"Navy Vintage Tee",
-    size:"M",
-    brand:"LabelCo",
-    info:"Vintage cut, 100% cotton. Machine wash cold.",
-    overlay:"https://via.placeholder.com/300x400?text=T-Shirt",
-    recs:["khaki_chinos","white_sneakers"]
+  "item:shirt:001": {
+    title: "Navy Vintage Tee",
+    size: "M",
+    brand: "LabelCo",
+    info: "Vintage cut, 100% cotton. Machine wash cold.",
+    overlay: "https://via.placeholder.com/300x400?text=T-Shirt",
+    model3d: "https://example.com/models/shirt001.glb",   // 3D model of the shirt
+    recs: ["khaki_chinos", "white_sneakers"]
   },
-  "item:jacket:002":{
-    title:"Utility Jacket",
-    size:"L",
-    brand:"FieldWorks",
-    info:"Lightweight, water-resistant. Recommend layering.",
-    overlay:"https://via.placeholder.com/300x400?text=Jacket",
-    recs:["black_boots","denim_jeans"]
+  "item:jacket:002": {
+    title: "Utility Jacket",
+    size: "L",
+    brand: "FieldWorks",
+    info: "Lightweight, water-resistant. Recommend layering.",
+    overlay: "https://via.placeholder.com/300x400?text=Jacket",
+    model3d: "https://example.com/models/jacket002.glb",  // 3D model of the jacket
+    recs: ["black_boots", "denim_jeans"]
   }
 };
+
 const RECS_FRIENDLY = {
-  "khaki_chinos":"Khaki chinos",
-  "white_sneakers":"White sneakers",
-  "black_boots":"Black boots",
-  "denim_jeans":"Denim jeans"
+  "khaki_chinos": "Khaki chinos",
+  "white_sneakers": "White sneakers",
+  "black_boots": "Black boots",
+  "denim_jeans": "Denim jeans"
 };
 
-const video=document.getElementById('camera');
-const canvas=document.getElementById('videoCanvas');
-const ctx=canvas.getContext('2d');
-const overlayImg=document.getElementById('overlay');
-const status=document.getElementById('status');
-const infoPanel=document.getElementById('infoPanel');
-const itemTitle=document.getElementById('itemTitle');
-const itemMeta=document.getElementById('itemMeta');
-const recs=document.getElementById('recs');
-const portraitInfo=document.getElementById('portraitInfo');
-const pTitle=document.getElementById('pTitle');
-const pMeta=document.getElementById('pMeta');
-const pRecs=document.getElementById('pRecs');
-const modeText=document.getElementById('modeText');
+/* ---------------------- CAMERA & QR LOGIC ----------------------- */
+const video = document.getElementById('camera');
+const canvas = document.getElementById('videoCanvas');
+const ctx = canvas.getContext('2d');
+const overlayImg = document.getElementById('overlay');
+const avatarModel = document.getElementById('avatarModel');
+const clothingModel = document.getElementById('clothingModel');
+const status = document.getElementById('status');
+const infoPanel = document.getElementById('infoPanel');
+const itemTitle = document.getElementById('itemTitle');
+const itemMeta = document.getElementById('itemMeta');
+const recs = document.getElementById('recs');
+const portraitInfo = document.getElementById('portraitInfo');
+const pTitle = document.getElementById('pTitle');
+const pMeta = document.getElementById('pMeta');
+const pRecs = document.getElementById('pRecs');
+const modeText = document.getElementById('modeText');
 
-let currentItem=null;
-let scanning=false;
+let currentItem = null;
+let scanning = false;
 
 async function startCamera(){
-  try{
+  try {
     const stream = await navigator.mediaDevices.getUserMedia({
-      video:{ facingMode:"environment" },
-      audio:false
+      video: { facingMode: "environment" },
+      audio: false
     });
-    video.srcObject=stream;
+    video.srcObject = stream;
     await video.play();
-  }catch(e){
+  } catch(e){
     alert("Camera blocked or not available. Use HTTPS.");
   }
 }
 
+/* ---------------------- QR SCAN ----------------------- */
 function scanFrameForQR(){
-  if(video.readyState!==video.HAVE_ENOUGH_DATA)return null;
-  canvas.width=video.videoWidth;
-  canvas.height=video.videoHeight;
-  ctx.drawImage(video,0,0,canvas.width,canvas.height);
-  const imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
-  const code = jsQR(imageData.data,imageData.width,imageData.height,{ inversionAttempts:"attemptBoth" });
+  if(video.readyState !== video.HAVE_ENOUGH_DATA) return null;
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts:"attemptBoth" });
   if(code){
     ctx.beginPath();
     ctx.moveTo(code.location.topLeftCorner.x, code.location.topLeftCorner.y);
@@ -284,71 +77,45 @@ function scanFrameForQR(){
     ctx.lineTo(code.location.bottomRightCorner.x, code.location.bottomRightCorner.y);
     ctx.lineTo(code.location.bottomLeftCorner.x, code.location.bottomLeftCorner.y);
     ctx.closePath();
-    ctx.lineWidth=4;
-    ctx.strokeStyle="red";
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "red";
     ctx.stroke();
   }
   return code ? code.data : null;
 }
 
-document.getElementById('scanBtn').addEventListener('click',()=>{
-  if(scanning){ scanning=false; scanBtn.textContent="Scan QR"; return; }
-  scanning=true;
-  scanBtn.textContent="Stop scanning";
-
-  const loop=()=>{
-    if(!scanning)return;
-    const q=scanFrameForQR();
-    if(q){
-      scanning=false;
-      scanBtn.textContent="Scan QR";
-      handleScan(q);
-    }else requestAnimationFrame(loop);
-  };
-  loop();
-});
-
+/* ---------------------- HANDLE SCAN → SHOW 3D ----------------------- */
 function handleScan(payload){
-  status.textContent="Scanned: "+payload;
+  status.textContent = "Scanned: " + payload;
   const item = ITEM_DB[payload];
   if(!item){ alert("Unknown QR: "+payload); return; }
 
-  currentItem=item;
+  currentItem = item;
 
-  overlayImg.src=item.overlay;
-  overlayImg.style.display="block";
+  // Show 3D models
+  avatarModel.style.display = "block";
+  clothingModel.style.display = "block";
+  clothingModel.src = item.model3d || "";
 
-  itemTitle.textContent=item.title;
-  itemMeta.textContent=item.brand+" • "+item.size+"\n"+item.info;
-  recs.innerHTML="";
-  item.recs.forEach(r=>{
-    const d=document.createElement("div");
-    d.textContent=RECS_FRIENDLY[r]||r;
+  // Hide 2D overlay
+  overlayImg.style.display = "none";
+
+  // Update info panel
+  itemTitle.textContent = item.title;
+  itemMeta.textContent = item.brand + " • " + item.size + "\n" + item.info;
+  recs.innerHTML = "";
+  item.recs.forEach(r => {
+    const d = document.createElement("div");
+    d.textContent = RECS_FRIENDLY[r] || r;
     recs.appendChild(d);
   });
+  infoPanel.style.display = "block";
 
-  infoPanel.style.display="block";
-  pTitle.textContent=item.title;
-  pMeta.textContent=item.brand+" — "+item.size+"\n"+item.info;
-  pRecs.innerHTML="<strong>Recommendations</strong><br>"+
-    item.recs.map(r=>RECS_FRIENDLY[r]||r).join(", ");
+  // Portrait info
+  pTitle.textContent = item.title;
+  pMeta.textContent = item.brand + " — " + item.size + "\n" + item.info;
+  pRecs.innerHTML = "<strong>Recommendations</strong><br>" +
+    item.recs.map(r => RECS_FRIENDLY[r] || r).join(", ");
 }
-
-function updateMode(){
-  const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-  if(isPortrait){
-    modeText.textContent="Info";
-    document.getElementById("view").style.display="none";
-    portraitInfo.style.display="block";
-  }else{
-    modeText.textContent="AR try-on";
-    document.getElementById("view").style.display="flex";
-    portraitInfo.style.display="none";
-  }
-}
-window.addEventListener("orientationchange",updateMode);
-window.addEventListener("resize",updateMode);
 
 </script>
-</body>
-</html>
