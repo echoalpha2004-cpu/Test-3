@@ -314,10 +314,11 @@ function handleScan(payload){
   currentItem=item;
 
   // Show 3D models
-  document.getElementById("avatarModel").style.display = "block";
-  document.getElementById("clothingModel").style.display = "block";
-  document.getElementById("clothingModel").src = item.model3d || "";
-
+  const avatar = document.getElementById("avatarModel");
+  const clothing = document.getElementById("clothingModel");
+  avatar.style.display = "block";
+  clothing.style.display = "block";
+  clothing.src = item.model3d || "";
   overlayImg.style.display = "none";
 
   itemTitle.textContent=item.title;
