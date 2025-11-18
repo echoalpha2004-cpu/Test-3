@@ -138,7 +138,9 @@
     <model-viewer id="clothingModel"
       src="Hammer.glb"
       alt="Clothing"
-      style="display:none; width:100%; height:100%; position:absolute; top:0; left:0; pointer-events:none; z-index:6;">
+      style="display:none; width:100%; height:100%; position:absolute; top:0; left:0; pointer-events:none; z-index:6;"
+      camera-controls
+      auto-rotate>
     </model-viewer>
 
     <div class="topbar">
@@ -318,7 +320,7 @@ function handleScan(payload){
   const clothing = document.getElementById("clothingModel");
   avatar.style.display = "block";
   clothing.style.display = "block";
-  clothing.src = item.model3d || "";
+  clothing.src = item.model3d || "Hammer.glb";
   overlayImg.style.display = "none";
 
   itemTitle.textContent=item.title;
