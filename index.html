@@ -249,22 +249,26 @@ function handleScan(payload){
 
   currentItem=item;
 
+// Show 3D models
 const avatar = document.getElementById("avatarModel");
 const clothing = document.getElementById("clothingModel");
 avatar.style.display = "block";
 clothing.style.display = "block";
+clothing.src = item.model3d || "Hammer.glb";
 overlayImg.style.display = "none";
 
-// ⭐ Fix initial clothing rotation so it faces forward like the avatar
-clothing.addEventListener('load', () => {
-    clothing.setAttribute('rotation', '180 0 0'); // X Y Z in degrees
-}, { once: true });
+// ⭐ Make clothing face same way as avatar initially
+clothing.setAttribute('rotation', '180 0 0'); // Flip X so it faces forward
 
-clothing.src = item.model3d || "Hammer.glb";
+// ⭐ Disable auto-rotate
+avatar.autoRotate = false;
+clothing.autoRotate = false;
 
-  // Disable auto-rotate
-  avatar.autoRotate = false;
-  clothing.autoRotate = false;
+// ⭐ Sync clothing rotation to avatar continuously
+avatar.addEventListener('camera-change', () => {
+  const orbit = avatar.getCameraOrbit();
+  clothing.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius}m`;
+});
 
   // Sync clothing rotation to avatar continuously
   function syncClothingRotation() {
