@@ -352,6 +352,9 @@ overlayImg.style.display = "none";
 avatar.autoRotate = false;
 clothing.autoRotate = false;
 
+// Flip the clothing model 180 degrees around Y-axis
+clothing.setAttribute('orientation', '0 180 0');
+  
 // ⭐ Fix initial clothing rotation offset
 clothing.setAttribute('rotation', '0 180 0'); // x y z in degrees
 
