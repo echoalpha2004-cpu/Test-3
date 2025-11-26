@@ -143,16 +143,17 @@
     width:45%;
     height:45%;
     position:absolute;
-    top:35%;               /* ⭐ moves the clothing higher */
+    top:35%;               /* keeps the clothing higher */
     left:50%;
     transform:translate(-50%, -50%);
-    pointer-events:auto;   /* ⭐ enable dragging */
+    pointer-events:auto;   /* enable dragging/rotation */
     z-index:6;
   "
   camera-controls
-  auto-rotate
   interaction-prompt="none"
-  disable-pan>
+  disable-pan
+  auto-rotate="false"       /* ⭐ stop idle spinning */
+  orientation="0 180 0">    /* ⭐ rotate 180° horizontally to fix facing */
 </model-viewer>
 
 
