@@ -134,23 +134,25 @@
       auto-rotate>
     </model-viewer>
 
-<!-- ⭐ 3D clothing item -->
+<!-- ⭐ 3D clothing item — UPDATED -->
 <model-viewer id="clothingModel"
   src="Hammer.glb"
   alt="Clothing"
   style="
     display:none;
-    width:50%;
-    height:50%;
+    width:45%;
+    height:45%;
     position:absolute;
-    top:50%;
+    top:35%;               /* ⭐ moves the clothing higher */
     left:50%;
     transform:translate(-50%, -50%);
-    pointer-events:none;
+    pointer-events:auto;   /* ⭐ enable dragging */
     z-index:6;
   "
   camera-controls
-  auto-rotate>
+  auto-rotate
+  interaction-prompt="none"
+  disable-pan>
 </model-viewer>
 
 
@@ -189,6 +191,17 @@
 <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
 <script>
+/* ⭐ Tie clothing rotation to avatar rotation */
+const avatar = document.getElementById("avatarModel");
+const clothing = document.getElementById("clothingModel");
+
+avatar.addEventListener("camera-change", () => {
+  // Read avatar's camera orbit
+  const orbit = avatar.getCameraOrbit();
+  // Apply identical orbit to clothing
+  clothing.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius}m`;
+});
+
 /* ---------------------- TITLE → PIN LOGIC ----------------------- */
 const titleScreen = document.getElementById("titleScreen");
 const pinScreen   = document.getElementById("pinScreen");
