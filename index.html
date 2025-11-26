@@ -340,36 +340,52 @@ function handleScan(payload){
 
   currentItem=item;
 
-  // Show 3D models
-  const avatar = document.getElementById("avatarModel");
-  const clothing = document.getElementById("clothingModel");
-  avatar.style.display = "block";
-  clothing.style.display = "block";
-  clothing.src = item.model3d || "Hammer.glb";
-  
-  // ⭐ Stop auto-rotation and fix initial rotation
-  avatar.autoRotate = false;
-  clothing.autoRotate = false;
-  
-  // Fix clothing rotation relative to avatar
-  clothing.setAttribute('rotation', '0 180 0'); // x y z in degrees
+ // Show 3D models
+const avatar = document.getElementById("avatarModel");
+const clothing = document.getElementById("clothingModel");
+avatar.style.display = "block";
+clothing.style.display = "block";
+clothing.src = item.model3d || "Hammer.glb";
+overlayImg.style.display = "none";
 
-  overlayImg.style.display = "none";
+// ⭐ Disable auto-rotate on avatar and clothing
+avatar.autoRotate = false;
+clothing.autoRotate = false;
 
-  itemTitle.textContent=item.title;
-  itemMeta.textContent=item.brand+" • "+item.size+"\n"+item.info;
+// ⭐ Fix initial clothing rotation offset
+clothing.setAttribute('rotation', '0 180 0'); // x y z in degrees
 
-  recs.innerHTML="";
-  item.recs.forEach(r=>{
-    const d=document.createElement("div");
-    d.textContent=RECS_FRIENDLY[r]||r;
-    recs.appendChild(d);
-  });
+// ⭐ Sync clothing rotation to avatar continuously
+function syncClothingRotation() {
+  // Read avatar's current rotation
+  const orbit = avatar.getCameraOrbit();
+  const theta = orbit.theta; // horizontal rotation in radians
+  const phi = orbit.phi;     // vertical rotation
+  const radius = orbit.radius;
 
-  infoPanel.style.display="block";
-  pTitle.textContent=item.title;
-  pMeta.textContent=item.brand+" — "+item.size+"\n"+item.info;
-  pRecs.innerHTML="<strong>Recommendations</strong><br>"+item.recs.map(r=>RECS_FRIENDLY[r]||r).join(", ");
+  // Apply same orbit to clothing with 180° Y offset
+  clothing.cameraOrbit = `${theta + Math.PI}rad ${phi}rad ${radius}rad`;
+
+  requestAnimationFrame(syncClothingRotation);
+}
+
+syncClothingRotation();
+
+// ⭐ Update info panels
+itemTitle.textContent = item.title;
+itemMeta.textContent = item.brand + " • " + item.size + "\n" + item.info;
+
+recs.innerHTML = "";
+item.recs.forEach(r => {
+  const d = document.createElement("div");
+  d.textContent = RECS_FRIENDLY[r] || r;
+  recs.appendChild(d);
+});
+
+infoPanel.style.display = "block";
+pTitle.textContent = item.title;
+pMeta.textContent = item.brand + " — " + item.size + "\n" + item.info;
+pRecs.innerHTML = "<strong>Recommendations</strong><br>" + item.recs.map(r => RECS_FRIENDLY[r] || r).join(", ");
 }
 
 function updateMode(){
