@@ -346,10 +346,14 @@ function handleScan(payload){
   avatar.style.display = "block";
   clothing.style.display = "block";
   clothing.src = item.model3d || "Hammer.glb";
-
-  // ⭐ Fix rotation and stop spinning
-  clothing.autoRotate = false;          // stops the idle spin
-  clothing.rotation = {x:0, y:180, z:0}; // rotates model 180° horizontally
+  
+  // ⭐ Stop auto-rotation and fix initial rotation
+  avatar.autoRotate = false;
+  clothing.autoRotate = false;
+  
+  // set initial rotation so they line up (adjust Y as needed)
+  avatar.rotation = {x:0, y:180, z:0};   
+  clothing.rotation = {x:0, y:180, z:0};
 
   overlayImg.style.display = "none";
 
