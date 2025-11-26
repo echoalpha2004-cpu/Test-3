@@ -257,51 +257,44 @@ clothing.style.display = "block";
 clothing.src = item.model3d || "Hammer.glb";
 overlayImg.style.display = "none";
 
-// ⭐ Make clothing face same way as avatar initially
-clothing.setAttribute('rotation', '-180 0 0'); // Flip X so it faces forward
-
-// ⭐ Disable auto-rotate
+// ⭐ Disable auto-rotate on avatar and clothing
 avatar.autoRotate = false;
 clothing.autoRotate = false;
 
+// ⭐ Fix initial clothing rotation offset
+clothing.setAttribute('rotation', '0 180 0'); // x y z in degrees
+
 // ⭐ Sync clothing rotation to avatar continuously
-avatar.addEventListener('camera-change', () => {
+function syncClothingRotation() {
+  // Read avatar's current rotation
   const orbit = avatar.getCameraOrbit();
-  clothing.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius}m`;
+  const theta = orbit.theta; // horizontal rotation in radians
+  const phi = orbit.phi;     // vertical rotation
+  const radius = orbit.radius;
+
+  // Apply same orbit to clothing with 180° Y offset
+  clothing.cameraOrbit = `${theta + Math.PI}rad ${phi}rad ${radius}rad`;
+
+  requestAnimationFrame(syncClothingRotation);
+}
+
+syncClothingRotation();
+
+// ⭐ Update info panels
+itemTitle.textContent = item.title;
+itemMeta.textContent = item.brand + " • " + item.size + "\n" + item.info;
+
+recs.innerHTML = "";
+item.recs.forEach(r => {
+  const d = document.createElement("div");
+  d.textContent = RECS_FRIENDLY[r] || r;
+  recs.appendChild(d);
 });
 
-  // Sync clothing rotation to avatar continuously
-  function syncClothingRotation() {
-    const orbit = avatar.getCameraOrbit();
-    clothing.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius}rad`;
-    requestAnimationFrame(syncClothingRotation);
-  }
-  syncClothingRotation();
-
-  // Update info panels
-  itemTitle.textContent = item.title;
-  itemMeta.textContent = item.brand + " • " + item.size + "\n" + item.info;
-
-  recs.innerHTML = "";
-  item.recs.forEach(r => {
-    const d = document.createElement("div");
-    d.textContent = RECS_FRIENDLY[r] || r;
-    recs.appendChild(d);
-  });
-
-  // Vertical portrait info
-  pTitle.textContent = item.title;
-  pMeta.innerHTML = `
-    <strong>Brand:</strong> ${item.brand}<br>
-    <strong>Size:</strong> ${item.size}<br>
-    <strong>Manufactured:</strong> ${item.manufacture || "N/A"}<br>
-    <strong>Materials:</strong> ${item.materials || "N/A"}<br>
-    <strong>Potential Irritants:</strong> ${item.potentialIrritants || "N/A"}<br>
-    <strong>Care Instructions:</strong> ${item.care || "N/A"}<br>
-    <strong>Disposal:</strong> ${item.disposal || "N/A"}<br>
-    <a href="${item.checkoutLink || "#"}" target="_blank" style="color:#ffd166; text-decoration:underline;">Buy Now</a>
-  `;
-  pRecs.innerHTML = `<strong>Recommendations:</strong> ${item.recs.map(r => RECS_FRIENDLY[r]||r).join(", ")}`;
+infoPanel.style.display = "block";
+pTitle.textContent = item.title;
+pMeta.textContent = item.brand + " — " + item.size + "\n" + item.info;
+pRecs.innerHTML = "<strong>Recommendations</strong><br>" + item.recs.map(r => RECS_FRIENDLY[r] || r).join(", ");
 }
 
 /* ---------------------- Orientation ----------------------- */
