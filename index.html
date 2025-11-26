@@ -351,9 +351,8 @@ function handleScan(payload){
   avatar.autoRotate = false;
   clothing.autoRotate = false;
   
-  // set initial rotation so they line up (adjust Y as needed)
-  avatar.rotation = {x:0, y:180, z:0};   
-  clothing.rotation = {x:0, y:180, z:0};
+  // Fix clothing rotation relative to avatar
+  clothing.setAttribute('rotation', '0 180 0'); // x y z in degrees
 
   overlayImg.style.display = "none";
 
