@@ -1,107 +1,51 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>AR Clothing Prototype — Demo</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>AR Clothing Prototype — Demo</title>
 
-  <style>
-    :root{--bg:#0b0b0b;--panel:#111;--accent:#ffd166}
-    html,body{height:100%;margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:#000;color:#eee;}
-
-    /* --- FULLSCREEN SCREENS --- */
-    .screen{
-      position:fixed;
-      inset:0;
-      background:#000;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-      z-index:9999;
-      transition:opacity .4s ease;
-    }
-    .screen.hidden{
-      opacity:0;
-      pointer-events:none;
-    }
-
-    /* Title screen */
-    #titleScreen img{
-      width:240px;
-      max-width:70%;
-      margin-bottom:20px;
-    }
-    #titleScreen .tap{
-      font-size:18px;
-      opacity:0.7;
-    }
-
-    /* PIN screen */
-    #pinScreen{
-      padding:20px;
-      text-align:center;
-      background:#000;
-    }
-    #pinDisplay{
-      font-size:32px;
-      letter-spacing:14px;
-      margin-bottom:24px;
-    }
-    .keypad{
-      display:grid;
-      grid-template-columns:repeat(3,70px);
-      gap:12px;
-      justify-content:center;
-    }
-    .keypad button{
-      background:#222;
-      border:1px solid #444;
-      color:#fff;
-      font-size:22px;
-      padding:16px;
-      border-radius:8px;
-    }
-    .keypad button:active{
-      background:#333;
-    }
-
-    /* --- ORIGINAL APP STYLE BELOW UNCHANGED --- */
-    .app{height:100%;display:none;flex-direction:column;background:var(--bg);}
-    #view{position:relative;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
-    video#camera{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
-    canvas#videoCanvas{position:absolute;top:0;left:0;width:100%;height:100%;}
-    img#overlay{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);max-width:70%;opacity:0.95;pointer-events:none}
-
-    .topbar{display:flex;gap:8px;padding:8px;background:linear-gradient(180deg,rgba(0,0,0,0.4),transparent);position:absolute;top:0;left:0;right:0;z-index:20}
-    button{background:#222;border:1px solid #333;color:#fff;padding:8px 10px;border-radius:6px}
-    .infoPanel{position:absolute;right:8px;bottom:8px;background:var(--panel);padding:12px;border-radius:10px;max-width:46%;z-index:20}
-    .hint{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,0.45);padding:8px;border-radius:8px;font-size:12px}
-    .modeBadge{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:#111;padding:6px 12px;border-radius:999px;border:1px solid #222;z-index:20}
-    .portraitInfo{display:none;padding:12px}
-
-    @media (orientation: portrait){
-      .portraitInfo{display:block;background:var(--panel);height:100%;overflow:auto}
-      #view{display:none}
-    }
-
-    footer{padding:8px;text-align:center;font-size:12px;background:linear-gradient(0deg,rgba(0,0,0,0.5),transparent)}
-    .metaLabel{color:#ccc;font-size:13px}
-  </style>
+<style>
+:root{--bg:#0b0b0b;--panel:#111;--accent:#ffd166}
+html,body{height:100%;margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:#000;color:#eee;}
+.screen{position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9999;transition:opacity .4s ease;}
+.screen.hidden{opacity:0;pointer-events:none;}
+#titleScreen img{width:240px;max-width:70%;margin-bottom:20px;}
+#titleScreen .tap{font-size:18px;opacity:0.7;}
+#pinScreen{padding:20px;text-align:center;background:#000;}
+#pinDisplay{font-size:32px;letter-spacing:14px;margin-bottom:24px;}
+.keypad{display:grid;grid-template-columns:repeat(3,70px);gap:12px;justify-content:center}
+.keypad button{background:#222;border:1px solid #444;color:#fff;font-size:22px;padding:16px;border-radius:8px}
+.keypad button:active{background:#333;}
+.app{height:100%;display:none;flex-direction:column;background:var(--bg);}
+#view{position:relative;flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+video#camera{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
+canvas#videoCanvas{position:absolute;top:0;left:0;width:100%;height:100%;}
+img#overlay{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);max-width:70%;opacity:0.95;pointer-events:none}
+.topbar{display:flex;gap:8px;padding:8px;background:linear-gradient(180deg,rgba(0,0,0,0.4),transparent);position:absolute;top:0;left:0;right:0;z-index:20}
+button{background:#222;border:1px solid #333;color:#fff;padding:8px 10px;border-radius:6px}
+.infoPanel{position:absolute;right:8px;bottom:8px;background:var(--panel);padding:12px;border-radius:10px;max-width:46%;z-index:20}
+.hint{position:absolute;left:8px;bottom:8px;background:rgba(0,0,0,0.45);padding:8px;border-radius:8px;font-size:12px}
+.modeBadge{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:#111;padding:6px 12px;border-radius:999px;border:1px solid #222;z-index:20}
+.portraitInfo{display:none;padding:12px}
+@media (orientation: portrait){
+  .portraitInfo{display:block;background:var(--panel);height:100%;overflow:auto}
+  #view{display:none}
+}
+footer{padding:8px;text-align:center;font-size:12px;background:linear-gradient(0deg,rgba(0,0,0,0.5),transparent)}
+.metaLabel{color:#ccc;font-size:13px}
+</style>
 </head>
 <body>
 
-<!-- --------------------- TITLE SCREEN --------------------- -->
 <div id="titleScreen" class="screen">
   <img src="logo.png" alt="Logo">
   <div class="tap">Tap to Continue</div>
 </div>
 
-<!-- --------------------- PIN SCREEN ----------------------- -->
 <div id="pinScreen" class="screen hidden">
   <h2>Enter PIN</h2>
   <div id="pinDisplay">____</div>
-
   <div class="keypad">
     <button data-n="1">1</button>
     <button data-n="2">2</button>
@@ -118,43 +62,13 @@
   </div>
 </div>
 
-<!-- ------------------ ORIGINAL APP INTERFACE ---------------- -->
 <div class="app" id="app">
   <div id="view">
     <video id="camera" autoplay playsinline></video>
     <canvas id="videoCanvas"></canvas>
     <img id="overlay" src="" style="display:none">
-
-    <!-- ⭐ 3D avatar -->
-    <model-viewer id="avatarModel"
-      src="avatar.glb"
-      alt="Avatar"
-      style="display:none; width:100%; height:100%; position:absolute; top:0; left:0; z-index:5;"
-      camera-controls
-      auto-rotate>
-    </model-viewer>
-
-<!-- ⭐ 3D clothing item — UPDATED -->
-<model-viewer id="clothingModel"
-  src="Hammer.glb"
-  alt="Clothing"
-  style="
-    display:none;
-    width:45%;
-    height:45%;
-    position:absolute;
-    top:35%;               /* moves the clothing higher */
-    left:50%;
-    transform:translate(-50%, -50%);
-    pointer-events:auto;   /* enable dragging/rotation */
-    z-index:6;
-  "
-  camera-controls
-  interaction-prompt="none"
-  disable-pan
-  auto-rotate="false">   <!-- stop idle spinning -->
-</model-viewer>
-
+    <model-viewer id="avatarModel" src="avatar.glb" alt="Avatar" style="display:none; width:100%; height:100%; position:absolute; top:0; left:0; z-index:5;" camera-controls auto-rotate></model-viewer>
+    <model-viewer id="clothingModel" src="Hammer.glb" alt="Clothing" style="display:none; width:45%; height:45%; position:absolute; top:35%; left:50%; transform:translate(-50%,-50%); pointer-events:auto; z-index:6;" camera-controls interaction-prompt="none" disable-pan auto-rotate="false"></model-viewer>
 
     <div class="topbar">
       <button id="scanBtn">Scan QR</button>
@@ -184,29 +98,14 @@
   <footer>Prototype — student build. Serve via HTTPS for camera access.</footer>
 </div>
 
-<!-- jsQR -->
 <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.min.js"></script>
-
-<!-- ⭐ model-viewer library -->
 <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
 <script>
-/* ⭐ Tie clothing rotation to avatar rotation */
-const avatar = document.getElementById("avatarModel");
-const clothing = document.getElementById("clothingModel");
-
-avatar.addEventListener("camera-change", () => {
-  // Read avatar's camera orbit
-  const orbit = avatar.getCameraOrbit();
-  // Apply identical orbit to clothing
-  clothing.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius}m`;
-});
-
 /* ---------------------- TITLE → PIN LOGIC ----------------------- */
 const titleScreen = document.getElementById("titleScreen");
 const pinScreen   = document.getElementById("pinScreen");
 const app         = document.getElementById("app");
-
 
 const CORRECT_PIN = "1234";
 let enteredPIN = "";
@@ -251,16 +150,12 @@ const ITEM_DB = {
     info:"Vintage cut, 100% cotton. Machine wash cold.",
     overlay:"https://via.placeholder.com/300x400?text=T-Shirt",
     model3d: "models/Hammer.glb",
-    recs:["khaki_chinos","white_sneakers"]
-
-        // NEW FIELDS
     manufacture: "Made in Turkey",
     materials: "100% Organic Cotton",
     potentialIrritants: "None",
     care: "Machine wash cold, tumble dry low",
     disposal: "Recycle or donate; biodegradable packaging",
     checkoutLink: "https://example.com/checkout/item001",
-    
     recs:["khaki_chinos","white_sneakers"]
   },
   "item:jacket:002":{
@@ -330,6 +225,7 @@ function scanFrameForQR(){
 }
 
 document.getElementById('scanBtn').addEventListener('click',()=>{
+  const scanBtn = document.getElementById('scanBtn');
   if(scanning){ scanning=false; scanBtn.textContent="Scan QR"; return; }
   scanning=true; scanBtn.textContent="Stop scanning";
 
@@ -342,15 +238,52 @@ document.getElementById('scanBtn').addEventListener('click',()=>{
   loop();
 });
 
-/* ⭐ UPDATED handleScan → switch to 3D models */
+/* ---------------------- handleScan ----------------------- */
 function handleScan(payload){
   status.textContent = "Scanned: " + payload;
   const item = ITEM_DB[payload];
   if(!item){ 
     alert("Unknown QR: " + payload); 
     return; 
+  }
 
-  // ⭐ VERTICAL INFO PANEL UPDATE ⭐
+  currentItem=item;
+
+  // Show 3D models
+  const avatar = document.getElementById("avatarModel");
+  const clothing = document.getElementById("clothingModel");
+  avatar.style.display = "block";
+  clothing.style.display = "block";
+  clothing.src = item.model3d || "Hammer.glb";
+  overlayImg.style.display = "none";
+
+  // Fix initial clothing rotation offset
+  clothing.setAttribute('rotation', '180 0 0'); // x y z in degrees
+
+  // Disable auto-rotate
+  avatar.autoRotate = false;
+  clothing.autoRotate = false;
+
+  // Sync clothing rotation to avatar continuously
+  function syncClothingRotation() {
+    const orbit = avatar.getCameraOrbit();
+    clothing.cameraOrbit = `${orbit.theta}rad ${orbit.phi}rad ${orbit.radius}rad`;
+    requestAnimationFrame(syncClothingRotation);
+  }
+  syncClothingRotation();
+
+  // Update info panels
+  itemTitle.textContent = item.title;
+  itemMeta.textContent = item.brand + " • " + item.size + "\n" + item.info;
+
+  recs.innerHTML = "";
+  item.recs.forEach(r => {
+    const d = document.createElement("div");
+    d.textContent = RECS_FRIENDLY[r] || r;
+    recs.appendChild(d);
+  });
+
+  // Vertical portrait info
   pTitle.textContent = item.title;
   pMeta.innerHTML = `
     <strong>Brand:</strong> ${item.brand}<br>
@@ -359,64 +292,13 @@ function handleScan(payload){
     <strong>Materials:</strong> ${item.materials || "N/A"}<br>
     <strong>Potential Irritants:</strong> ${item.potentialIrritants || "N/A"}<br>
     <strong>Care Instructions:</strong> ${item.care || "N/A"}<br>
-    <strong>Disposal:</strong> ${item.disposal || "N/A"}
-  `;
-  pRecs.innerHTML = `
-    <strong>Recommendations:</strong> ${item.recs.map(r => RECS_FRIENDLY[r]||r).join(", ")}<br>
+    <strong>Disposal:</strong> ${item.disposal || "N/A"}<br>
     <a href="${item.checkoutLink || "#"}" target="_blank" style="color:#ffd166; text-decoration:underline;">Buy Now</a>
   `;
+  pRecs.innerHTML = `<strong>Recommendations:</strong> ${item.recs.map(r => RECS_FRIENDLY[r]||r).join(", ")}`;
 }
 
-  currentItem=item;
-
- // Show 3D models
-const avatar = document.getElementById("avatarModel");
-const clothing = document.getElementById("clothingModel");
-avatar.style.display = "block";
-clothing.style.display = "block";
-clothing.src = item.model3d || "Hammer.glb";
-overlayImg.style.display = "none";
-
-// ⭐ Fix initial clothing rotation offset
-clothing.setAttribute('rotation', '180 0 0'); // x y z in degrees
-
-// ⭐ Disable auto-rotate on avatar and clothing
-avatar.autoRotate = false;
-clothing.autoRotate = false;
-
-// ⭐ Sync clothing rotation to avatar continuously
-function syncClothingRotation() {
-  // Read avatar's current rotation
-  const orbit = avatar.getCameraOrbit();
-  const theta = orbit.theta; // horizontal rotation in radians
-  const phi = orbit.phi;     // vertical rotation
-  const radius = orbit.radius;
-
-  // Apply same orbit to clothing with 180° Y offset
-  clothing.cameraOrbit = `${theta + Math.PI}rad ${phi}rad ${radius}rad`;
-
-  requestAnimationFrame(syncClothingRotation);
-}
-
-syncClothingRotation();
-
-// ⭐ Update info panels
-itemTitle.textContent = item.title;
-itemMeta.textContent = item.brand + " • " + item.size + "\n" + item.info;
-
-recs.innerHTML = "";
-item.recs.forEach(r => {
-  const d = document.createElement("div");
-  d.textContent = RECS_FRIENDLY[r] || r;
-  recs.appendChild(d);
-});
-
-infoPanel.style.display = "block";
-pTitle.textContent = item.title;
-pMeta.textContent = item.brand + " — " + item.size + "\n" + item.info;
-pRecs.innerHTML = "<strong>Recommendations</strong><br>" + item.recs.map(r => RECS_FRIENDLY[r] || r).join(", ");
-}
-
+/* ---------------------- Orientation ----------------------- */
 function updateMode(){
   const isPortrait = window.matchMedia("(orientation: portrait)").matches;
   if(isPortrait){
@@ -432,5 +314,7 @@ function updateMode(){
 window.addEventListener("orientationchange",updateMode);
 window.addEventListener("resize",updateMode);
 </script>
+
 </body>
 </html>
+
