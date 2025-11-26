@@ -252,6 +252,16 @@ const ITEM_DB = {
     overlay:"https://via.placeholder.com/300x400?text=T-Shirt",
     model3d: "models/Hammer.glb",
     recs:["khaki_chinos","white_sneakers"]
+
+        // NEW FIELDS
+    manufacture: "Made in Turkey",
+    materials: "100% Organic Cotton",
+    potentialIrritants: "None",
+    care: "Machine wash cold, tumble dry low",
+    disposal: "Recycle or donate; biodegradable packaging",
+    checkoutLink: "https://example.com/checkout/item001",
+    
+    recs:["khaki_chinos","white_sneakers"]
   },
   "item:jacket:002":{
     title:"Utility Jacket",
@@ -334,9 +344,29 @@ document.getElementById('scanBtn').addEventListener('click',()=>{
 
 /* ⭐ UPDATED handleScan → switch to 3D models */
 function handleScan(payload){
-  status.textContent="Scanned: "+payload;
+  status.textContent = "Scanned: " + payload;
   const item = ITEM_DB[payload];
-  if(!item){ alert("Unknown QR: "+payload); return; }
+  if(!item){ 
+    alert("Unknown QR: " + payload); 
+    return; 
+  }
+
+  // ⭐ VERTICAL INFO PANEL UPDATE ⭐
+  pTitle.textContent = item.title;
+  pMeta.innerHTML = `
+    <strong>Brand:</strong> ${item.brand}<br>
+    <strong>Size:</strong> ${item.size}<br>
+    <strong>Manufactured:</strong> ${item.manufacture || "N/A"}<br>
+    <strong>Materials:</strong> ${item.materials || "N/A"}<br>
+    <strong>Potential Irritants:</strong> ${item.potentialIrritants || "N/A"}<br>
+    <strong>Care Instructions:</strong> ${item.care || "N/A"}<br>
+    <strong>Disposal:</strong> ${item.disposal || "N/A"}
+  `;
+  pRecs.innerHTML = `
+    <strong>Recommendations:</strong> ${item.recs.map(r => RECS_FRIENDLY[r]||r).join(", ")}<br>
+    <a href="${item.checkoutLink || "#"}" target="_blank" style="color:#ffd166; text-decoration:underline;">Buy Now</a>
+  `;
+}
 
   currentItem=item;
 
