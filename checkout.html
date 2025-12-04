@@ -1,20 +1,44 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <title>Checkout</title>
-  <style>
-    body { font-family: Arial; padding: 40px; background: #f6f6f6; }
-    .box { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin:auto; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Checkout — AR Clothing Prototype</title>
+<style>
+  body { background:#000; color:#eee; font-family:system-ui,Segoe UI,Roboto,Arial; padding:20px; }
+  h1 { color:#ffd166; }
+  .item { margin-bottom:20px; }
+  button { background:#ffd166; color:#000; border:none; padding:10px 20px; font-size:16px; cursor:pointer; border-radius:6px; }
+</style>
 </head>
 <body>
-  <div class="box">
-    <h2>Vera Checkout</h2>
-    <p>You are purchasing: <strong>Utility Jacket</strong></p>
-    <p>Total: <strong>$120</strong></p>
-    <button onclick="alert('Demo only — no real purchase!')">
-      Complete Purchase
-    </button>
-  </div>
+
+<h1>Checkout</h1>
+
+<div class="item">
+  <strong id="itemTitle">Item Name</strong><br>
+  <span id="itemDetails">Item details go here</span>
+</div>
+
+<form id="checkoutForm">
+  <label>Name:<br><input type="text" name="name" required></label><br><br>
+  <label>Email:<br><input type="email" name="email" required></label><br><br>
+  <label>Credit Card:<br><input type="text" name="card" placeholder="1234 5678 9012 3456" required></label><br><br>
+  <button type="submit">Place Order</button>
+</form>
+
+<div id="confirmation" style="display:none; margin-top:20px; color:#0f0;">
+  ✅ Thank you! Your order has been placed.
+</div>
+
+<script>
+  const form = document.getElementById('checkoutForm');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    form.style.display = 'none';
+    document.getElementById('confirmation').style.display = 'block';
+  });
+</script>
+
 </body>
 </html>
