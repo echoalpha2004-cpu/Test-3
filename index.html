@@ -191,7 +191,7 @@ const ITEM_DB = {
     potentialIrritants: "None",
     care: "Machine wash cold, tumble dry low",
     disposal: "Recycle or donate; biodegradable packaging",
-    checkoutLink: ""checkout.html"",
+    checkoutLink: "https://example.com/checkout/item001",
     recs:["khaki_chinos","white_sneakers"]
   },
   "item:jacket:002":{
@@ -298,8 +298,6 @@ overlayImg.style.display = "none";
 avatar.autoRotate = false;
 clothing.autoRotate = false;
 
-
-
 // ⭐ Fix initial clothing rotation offset
 clothing.setAttribute('rotation', '180 0 0'); // x y z in degrees
 
@@ -364,4 +362,3 @@ window.addEventListener("resize",updateMode);
 
 </body>
 </html>
-
