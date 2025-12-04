@@ -103,32 +103,11 @@ footer{padding:8px;text-align:center;font-size:12px;background:linear-gradient(0
   </div>
 
   <div class="portraitInfo" id="portraitInfo">
-<div class="portraitInfo" id="portraitInfo">
     <img src="logo.png" 
      style="width:140px; display:block; margin:10px auto 20px auto; opacity:0.9;">
     <h2 id="pTitle">No item scanned</h2>
     <p id="pMeta"></p>
-
-    <h3>Care Instructions</h3>
-    <p id="pCare"></p>
-
-    <h3>Material & Manufacturing</h3>
-    <p id="pMaterial"></p>
-    <p id="pManufacture"></p>
-
-    <h3>Potential Irritants</h3>
-    <p id="pIrritants"></p>
-
-    <h3>Disposal</h3>
-    <p id="pDisposal"></p>
-
-    <h3>Recommendations</h3>
     <div id="pRecs"></div>
-
-    <br>
-    <a id="pCheckout" href="#" style="color:#ffd166; font-weight:bold;" target="_blank">
-        Buy Now →
-    </a>
   </div>
 
   <footer>Prototype — student build. Serve via HTTPS for camera access.</footer>
@@ -331,16 +310,7 @@ item.recs.forEach(r => {
 infoPanel.style.display = "block";
 pTitle.textContent = item.title;
 pMeta.textContent = item.brand + " — " + item.size + "\n" + item.info;
-
-pCare.textContent = item.care || "—";
-pMaterial.textContent = item.materials || "—";
-pManufacture.textContent = item.manufacture || "—";
-pIrritants.textContent = item.potentialIrritants || "—";
-pDisposal.textContent = item.disposal || "—";
-
-pRecs.innerHTML = item.recs.map(r => RECS_FRIENDLY[r] || r).join(", ");
-
-document.getElementById("pCheckout").href = item.checkoutLink || "#";
+pRecs.innerHTML = "<strong>Recommendations</strong><br>" + item.recs.map(r => RECS_FRIENDLY[r] || r).join(", ");
 }
 
 /* ---------------------- Orientation ----------------------- */
