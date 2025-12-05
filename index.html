@@ -313,18 +313,23 @@ overlayImg.style.display = "none";
 avatar.autoRotate = false;
 clothing.autoRotate = false;
 
-// ⭐ Fix initial clothing rotation offset
+// ⭐ Fix initial clothing rotation offset 
 clothing.setAttribute('rotation', '180 0 0'); // x y z in degrees
 
-// ⭐ Sync clothing rotation to avatar continuously
+// ⭐ Identify the currently-active avatar
+function getActiveAvatar() {
+  return avatar2.style.display === "block" ? avatar2 : avatar;
+}
+
+// ⭐ Sync clothing rotation to active avatar continuously
 function syncClothingRotation() {
-  // Read avatar's current rotation
-  const orbit = avatar.getCameraOrbit();
-  const theta = orbit.theta; // horizontal rotation in radians
-  const phi = orbit.phi;     // vertical rotation
+  const activeAvatar = getActiveAvatar();
+  const orbit = activeAvatar.getCameraOrbit();
+  const theta = orbit.theta; 
+  const phi = orbit.phi;     
   const radius = orbit.radius;
 
-  // Apply same orbit to clothing with 180° Y offset
+  // Apply same orbit to clothing with your 180° X offset
   clothing.cameraOrbit = `${theta + Math.PI}rad ${phi}rad ${radius}rad`;
 
   requestAnimationFrame(syncClothingRotation);
