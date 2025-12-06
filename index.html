@@ -316,28 +316,28 @@ clothing.autoRotate = false;
 // ⭐ Fix initial clothing rotation offset 
 clothing.setAttribute('rotation', '180 0 0'); // x y z in degrees
 
+// ⭐ Fix initial body rotation offset 
+avatar2.setAttribute('rotation', '180 0 0'); // x y z in degrees
+
 // ⭐ Identify the currently-active avatar
 function getActiveAvatar() {
-  if (avatar2.style.display === "block") {
-    return { model: avatar2, offset: avatarOffsets.avatarModel2 };
-  } else {
-    return { model: avatar, offset: avatarOffsets.avatarModel };
-  }
+  return avatar2.style.display === "block" ? avatar2 : avatar;
 }
 
+// ⭐ Sync clothing rotation to active avatar continuously
 function syncClothingRotation() {
-  const { model: activeAvatar, offset } = getActiveAvatar();
+  const activeAvatar = getActiveAvatar();
   const orbit = activeAvatar.getCameraOrbit();
   const theta = orbit.theta; 
   const phi = orbit.phi;     
   const radius = orbit.radius;
 
-  // Sync clothing to avatar + offset
-  clothing.cameraOrbit = `${theta + offset}rad ${phi}rad ${radius}rad`;
+  // Apply same orbit to clothing with your 180° X offset
+  clothing.cameraOrbit = `${theta + Math.PI}rad ${phi}rad ${radius}rad`;
 
   requestAnimationFrame(syncClothingRotation);
 }
-  
+
 syncClothingRotation();
 
 // ⭐ Update info panels
@@ -384,11 +384,8 @@ function updateMode(){
 const avatar1 = document.getElementById("avatarModel");
 const avatar2 = document.getElementById("avatarModel2");
 
-// ⭐ Rotation offsets for syncing clothes
-const avatarOffsets = {
-  avatarModel: 0,       // no offset
-  avatarModel2: Math.PI // 180° offset for avatar2
-};
+// ⭐ Correctly rotate avatar2 now that it EXISTS
+avatar2.setAttribute("rotation", "180 0 0");
 
 let usingAvatar2 = false;
 
