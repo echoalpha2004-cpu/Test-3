@@ -384,6 +384,9 @@ function updateMode(){
 const avatar1 = document.getElementById("avatarModel");
 const avatar2 = document.getElementById("avatarModel2");
 
+// ⭐ Correctly rotate avatar2 now that it EXISTS
+avatar2.setAttribute("rotation", "180 0 0");
+
 let usingAvatar2 = false;
 
 document.getElementById("toggleAvatar").addEventListener("click", () => {
