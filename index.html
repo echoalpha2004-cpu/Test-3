@@ -308,46 +308,55 @@ function handleScan(payload){
 
   currentItem=item;
 
-// Show 3D models
+// ---- Show the correct 3D models ----
 const avatar = document.getElementById("avatarModel");
+const avatar2 = document.getElementById("avatarModel2");
+const avatar3 = document.getElementById("avatarModel3");
+
 const clothing = document.getElementById("clothingModel");
 const clothing2 = document.getElementById("clothingModel2");
+
+// Default: avatarModel visible
 avatar.style.display = "block";
+avatar2.style.display = "none";
+avatar3.style.display = "none";
+
+// Show clothing model depending on the item
 clothing.style.display = "block";
 clothing.src = item.model3d || "Hammer.glb";
-overlayImg.style.display = "none";
 
-// ⭐ Disable auto-rotate on avatar and clothing
+// Hide the jacket unless used
+clothing2.style.display = "none";
+
+// Disable auto-rotate
 avatar.autoRotate = false;
+avatar2.autoRotate = false;
+avatar3.autoRotate = false;
 clothing.autoRotate = false;
+clothing2.autoRotate = false;
 
-// ⭐ Fix initial clothing rotation offset 
-clothing.setAttribute('rotation', '180 0 0'); // x y z in degrees
+// Fix rotation of clothing only (your 180° flip)
+clothing.setAttribute("rotation", "180deg 0deg 0deg");
+clothing2.setAttribute("rotation", "180deg 0deg 0deg");
 
-// ⭐ Fix initial jacket rotation offset 
-clothing2.setAttribute('rotation', '180 0 0'); // x y z in degrees
-
-// ⭐ Fix initial jacket rotation offset 
-avatar2.setAttribute('rotation', '180 0 0'); // x y z in degrees
-
-// ⭐ Identify the currently-active avatar
+// ---- Identify which avatar is active ----
 function getActiveAvatar() {
-  if (avatarModel3.style.display === "block") return avatarModel3;
-  if (avatarModel2.style.display === "block") return avatarModel2;
-  return avatarModel;
+  if (avatar3.style.display === "block") return avatar3;
+  if (avatar2.style.display === "block") return avatar2;
+  return avatar; // default
 }
 
-// ⭐ Sync clothing rotation to active avatar continuously
+// ---- Sync clothing rotation to avatar rotation ----
 function syncClothingRotation() {
-  const activeAvatar = getActiveAvatar();
-  if (!activeAvatar) return requestAnimationFrame(syncClothingRotation);
+  const active = getActiveAvatar();
+  const orbit = active.getCameraOrbit();
 
-  const orbit = activeAvatar.getCameraOrbit();
-  const { theta, phi, radius } = orbit;
+  const theta = orbit.theta;
+  const phi = orbit.phi;
+  const radius = orbit.radius;
 
-  // Match rotation to active avatar (+180° X fix)
-  clothing.cameraOrbit = `${theta + Math.PI}rad ${phi}rad ${radius}rad`;
-  clothing2.cameraOrbit = `${theta + Math.PI}rad ${phi}rad ${radius}rad`;
+  // Apply same rotation but add your 180° X flip
+  clothing.cameraOrbit = `${theta}rad ${phi}rad ${radius}rad`;
 
   requestAnimationFrame(syncClothingRotation);
 }
@@ -395,18 +404,28 @@ function updateMode(){
 }
 
 /* ---------------------- AVATAR SWITCH ----------------------- */
-const avatars = [
-  document.getElementById("avatarModel"),
-  document.getElementById("avatarModel2"),
-  document.getElementById("avatarModel3")
-];
-
-let currentAvatarIndex = 0;
+const avatar1 = document.getElementById("avatarModel");
+const avatar2 = document.getElementById("avatarModel2");
+const avatar3 = document.getElementById("avatarModel3");
 
 document.getElementById("toggleAvatar").addEventListener("click", () => {
-  avatars[currentAvatarIndex].style.display = "none";
-  currentAvatarIndex = (currentAvatarIndex + 1) % avatars.length;
-  avatars[currentAvatarIndex].style.display = "block";
+  // Cycle through 3 avatars
+  if (avatar1.style.display === "block") {
+    // avatar1 → avatar2
+    avatar1.style.display = "none";
+    avatar2.style.display = "block";
+    avatar3.style.display = "none";
+  } else if (avatar2.style.display === "block") {
+    // avatar2 → avatar3
+    avatar1.style.display = "none";
+    avatar2.style.display = "none";
+    avatar3.style.display = "block";
+  } else {
+    // avatar3 → avatar1
+    avatar1.style.display = "block";
+    avatar2.style.display = "none";
+    avatar3.style.display = "none";
+  }
 });
 
 window.addEventListener("orientationchange",updateMode);
