@@ -78,6 +78,14 @@ footer{padding:8px;text-align:center;font-size:12px;background:linear-gradient(0
     camera-controls
     auto-rotate>
     </model-viewer>
+    <model-viewer
+    id="avatarModel3"
+    src="avatar3.glb"
+    alt="Avatar 3"
+    style="display:none; width:100%; height:100%; position:absolute; top:0; left:0; z-index:5;"
+    camera-controls
+    auto-rotate>
+    </model-viewer>
     <model-viewer id="clothingModel" src="Hammer.glb" alt="Clothing" style="display:none; width:45%; height:45%; position:absolute; top:35%; left:50%; transform:translate(-50%,-50%); pointer-events:auto; z-index:6;" camera-controls interaction-prompt="none" disable-pan auto-rotate="false"></model-viewer>
     <model-viewer 
     id="clothingModel2" 
@@ -384,21 +392,35 @@ function updateMode(){
 }
 
 /* ---------------------- AVATAR SWITCH ----------------------- */
+/* ---------------------- AVATAR SWITCH ----------------------- */
 const avatar1 = document.getElementById("avatarModel");
 const avatar2 = document.getElementById("avatarModel2");
+const avatar3 = document.getElementById("avatarModel3");
 
-let usingAvatar2 = false;
+// Track which avatar index is active
+let avatarIndex = 0; // 0 = avatar1, 1 = avatar2, 2 = avatar3
 
+// Toggle button cycles through all 3
 document.getElementById("toggleAvatar").addEventListener("click", () => {
-  usingAvatar2 = !usingAvatar2;
+  avatarIndex = (avatarIndex + 1) % 3; // 0→1→2→0
 
-  if (usingAvatar2) {
-    avatar1.style.display = "none";
-    avatar2.style.display = "block";
-  } else {
-    avatar1.style.display = "block";
-    avatar2.style.display = "none";
-  }
+  // Hide all
+  avatar1.style.display = "none";
+  avatar2.style.display = "none";
+  avatar3.style.display = "none";
+
+  // Show the selected one
+  if (avatarIndex === 0) avatar1.style.display = "block";
+  if (avatarIndex === 1) avatar2.style.display = "block";
+  if (avatarIndex === 2) avatar3.style.display = "block";
+});
+
+// ------------------ Sync clothing rotation ------------------
+function getActiveAvatar() {
+  if (avatar3.style.display === "block") return avatar3;
+  if (avatar2.style.display === "block") return avatar2;
+  return avatar1;
+}
 });
 
 window.addEventListener("orientationchange",updateMode);
