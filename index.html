@@ -340,13 +340,14 @@ function getActiveAvatar() {
 // ⭐ Sync clothing rotation to active avatar continuously
 function syncClothingRotation() {
   const activeAvatar = getActiveAvatar();
-  const orbit = activeAvatar.getCameraOrbit();
-  const theta = orbit.theta; 
-  const phi = orbit.phi;     
-  const radius = orbit.radius;
+  if (!activeAvatar) return requestAnimationFrame(syncClothingRotation);
 
-  // Apply same orbit to clothing with your 180° X offset
+  const orbit = activeAvatar.getCameraOrbit();
+  const { theta, phi, radius } = orbit;
+
+  // Match rotation to active avatar (+180° X fix)
   clothing.cameraOrbit = `${theta + Math.PI}rad ${phi}rad ${radius}rad`;
+  clothing2.cameraOrbit = `${theta + Math.PI}rad ${phi}rad ${radius}rad`;
 
   requestAnimationFrame(syncClothingRotation);
 }
